@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Quadrangle Circle</title>
+		<style type="text/css"></style>
+		<script type="text/javascript">
+			// http://www.hunlock.com/blogs/Totally_Pwn_CSS_with_Javascript
+			// by http://stackoverflow.com/questions/1409225/changing-a-css-rule-set-from-javascript
+			function getCSSRule(ruleName, deleteFlag) {               // Return requested style obejct
+				ruleName=ruleName.toLowerCase();                       // Convert test string to lower case.
+				if (document.styleSheets) {                            // If browser can play with stylesheets
+					for (var i=0; i<document.styleSheets.length; i++) { // For each stylesheet
+						var styleSheet=document.styleSheets[i];          // Get the current Stylesheet
+						var ii=0;                                        // Initialize subCounter.
+						var cssRule=false;                               // Initialize cssRule. 
+						do {                                             // For each rule in stylesheet
+							if (styleSheet.cssRules) {                    // Browser uses cssRules?
+								cssRule = styleSheet.cssRules[ii];         // Yes --Mozilla Style
+							} else {                                      // Browser usses rules?
+								cssRule = styleSheet.rules[ii];            // Yes IE style. 
+							}                                             // End IE check.
+							if (cssRule)  {                               // If we found a rule...
+								if (cssRule.selectorText.toLowerCase()==ruleName) { //  match ruleName?
+									if (deleteFlag=='delete') {             // Yes.  Are we deleteing?
+										if (styleSheet.cssRules) {           // Yes, deleting...
+											styleSheet.deleteRule(ii);        // Delete rule, Moz Style
+										} else {                             // Still deleting.
+											styleSheet.removeRule(ii);        // Delete rule IE style.
+										}                                    // End IE check.
+										return true;                         // return true, class deleted.
+									} else {                                // found and not deleting.
+										return cssRule;                      // return the style object.
+									}                                       // End delete Check
+								}                                          // End found rule name
+							}                                             // end found cssRule
+							ii++;                                         // Increment sub-counter
+						} while (cssRule)                                // end While loop
+					}                                                   // end For loop
+				}                                                      // end styleSheet ability check
+				return false;                                          // we found NOTHING!
+			}                                                         // end getCSSRule 
+			function killCSSRule(ruleName) {                          // Delete a CSS rule   
+				return getCSSRule(ruleName,'delete');                  // just call getCSSRule w/delete flag.
+			}                                                         // end killCSSRule
+			function addCSSRule(ruleName) {                           // Create a new css rule
+				if (document.styleSheets) {                            // Can browser do styleSheets?
+					if (!getCSSRule(ruleName)) {                        // if rule doesn't exist...
+						if ( document.styleSheets[0] === null ) {
+							var cssNode = document.createElement('style');
+							cssNode.type = 'text/css';
+							cssNode.rel = 'stylesheet';
+							cssNode.media = 'screen';
+							cssNode.title = 'dynamicSheet';
+							document.getElementsByTagName("head")[0].appendChild(cssNode);
+						}
+						if (document.styleSheets[0].addRule) {           // Browser is IE?
+							document.styleSheets[0].addRule(ruleName, null,0);      // Yes, add IE style
+						} else {                                         // Browser is IE?
+							document.styleSheets[0].insertRule(ruleName+' { }', 0); // Yes, add Moz style.
+						}                                                // End browser check
+					}                                                   // End already exist check.
+				}                                                      // End browser ability check.
+				return getCSSRule(ruleName);                           // return rule we just created.
+			} 
+		</script>
+		<script type="text/javascript">
+			function get_a_i_j( n, i, j ) {
+				var a_i_j;
+				n = parseInt( n );
+				i = parseInt( i );
+				j = parseInt( j );
+				if ( !( n > 0 && i >= 0 && j >= 0 && i < n && j < n ) ) {
+					return 0;
+				} else if ( n == 1 ) {
+					return 1;
+				} else {
+					var circuit = Math.min( Math.min( i, j ), ( i + j + 1 ) >= n ? ( n - 1 ) % Math.max( i, j ) : n ); // какой контур - [0, Math.ceil( n / 2 )]
+					var maxprev = ( circuit > 0 ? ( 4 * ( n - 1 ) + 4 * ( n > 4 && circuit > 1 ? ( ( circuit - 1 ) * ( ( n - 3 ) + ( ( n - 3 ) - 2 * ( circuit - 2 ) ) ) / 2 ) : 0 ) ) : 0 ); // максимальное число в предыдущем контуре
+					a_i_j = maxprev;
+					if ( i > j ) {// если в нижнем левом углу
+						a_i_j += ( n - ( 2 * circuit ) - 1 ) * 2; // верхний правый угол
+						a_i_j += ( n - ( 2 * circuit ) - ( j - circuit ) - 1 ); // по горизонтали
+						a_i_j += ( n - ( 2 * circuit ) - ( i - circuit ) - 1 ); // по вертикали
+						a_i_j += 1; // угол
+					} else {
+						a_i_j += ( j - circuit ); // по горизонтали
+						a_i_j += ( i - circuit ); // по вертикали
+						a_i_j += 1; // угол
+					}
+					return a_i_j;
+				}
+			}
+			function generete_table( table, n ) {
+				n = parseInt( n );
+				table.innerHTML = '';
+				if ( table.tagName.toLowerCase() == 'table' && n > 0 ) {
+					var table_css = addCSSRule( '#' + table.id );
+					table_css.style.borderSpacing = "0";
+					table_css.style.border = "0";
+					var table_td_css = addCSSRule( '#' + table.id + ' tr td' );
+					table_td_css.style.borderBottom = '1px solid black';
+					table_td_css.style.borderLeft = '1px solid black';
+					table_td_css.style.padding = "5px";
+					var first_table_td_css = addCSSRule( '#' + table.id + ' tr td:first-child' );
+					first_table_td_css.style.borderBottom = '1px solid black';
+					first_table_td_css.style.borderLeft = '1px solid transparent';
+					
+					var head, i_j, j_td, j, i_tr, i_td, value_td, i;
+					head = document.createElement( 'tr' );
+					i_j = document.createElement( 'td' );
+					i_j.innerHTML = 'i\\j';
+					head.appendChild( i_j );
+					for ( j = 0; j < n; j++ ) {
+						j_td = document.createElement( 'td' );
+						j_td.innerHTML = j;
+						head.appendChild( j_td );
+					}
+					table.appendChild( head );
+					for ( i = 0; i < n; i++ ) {
+						i_tr = document.createElement( 'tr' );
+						i_td = document.createElement( 'td' );
+						i_td.innerHTML = i;
+						i_tr.appendChild( i_td );
+						for ( j = 0; j < n; j++ ) {
+							value_td = document.createElement( 'td' );
+							value_td.innerHTML = get_a_i_j( n, i, j );
+							i_tr.appendChild( value_td );
+						}
+						table.appendChild( i_tr );
+					}
+				}
+			}
+		</script>
+	</head>
+	<body>
+		n ( integer, > 0 ): <input id="n" value="10" />
+		i ( integer, [ 0, n - 1 ] ): <input id="i" value="5" />
+		j ( integer, [ 0, n - 1 ] ): <input id="j" value="6" />
+		<button onclick="var table_tag = document.getElementById( 'table' ); var n_value = document.getElementById( 'n' ).value; var i_value = document.getElementById( 'i' ).value; var j_value = document.getElementById( 'j' ).value; var a_i_j_tag = document.getElementById( 'a_i_j' ); generete_table( table_tag, n_value ); a_i_j.innerHTML = 'a[ ' + i_value + ' ][ ' + j_value + ' ]( ' + n_value + ' ) = ' + get_a_i_j( n_value, i_value, j_value );">Get a[ i ][ j ]( n )</button>
+		<div id="a_i_j"></div>
+		<table id="table"></table>
+	</body>
+</html>
