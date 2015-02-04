@@ -74,7 +74,7 @@
 				} else if ( n == 1 ) {
 					return 1;
 				} else {
-					var circuit = Math.min( Math.min( i, j ), ( i + j + 1 ) >= n ? ( n - 1 ) % Math.max( i, j ) : n ); // какой контур - [0, Math.ceil( n / 2 )]
+					var circuit = Math.min( Math.min( i, j ), ( i + j + 1 ) > n ? ( n - 1 ) % Math.max( i, j ) : n ); // какой контур - [0, Math.ceil( n / 2 )]
 					var maxprev = ( circuit > 0 ? ( 4 * ( n - 1 ) + 4 * ( n > 4 && circuit > 1 ? ( ( circuit - 1 ) * ( ( n - 3 ) + ( ( n - 3 ) - 2 * ( circuit - 2 ) ) ) / 2 ) : 0 ) ) : 0 ); // максимальное число в предыдущем контуре
 					a_i_j = maxprev;
 					if ( i > j ) {// если в нижнем левом углу
